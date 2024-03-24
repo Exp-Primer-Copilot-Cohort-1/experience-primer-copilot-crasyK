@@ -1,37 +1,33 @@
-// Create Web server
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
+//Create Web Server 
+var http = require('http');
 var fs = require('fs');
+var url = require('url');
 var path = require('path');
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var db = mongoose.connect('mongodb://localhost/comments');
+var comments = [];
 
-var commentSchema = new Schema({
-    name: String,
-    comment: String
+var server = http.createServer(function(req, res) {
+    var urlObj = url.parse(req.url, true);
+    var pathname = urlObj.pathname;
+    if (pathname == '/') {
+        var htmlPath = path.join(__dirname, '/index.html');
+        var htmlContent = fs.readFileSync(htmlPath);
+        htmlContent = htmlContent.toString('utf8');
+        res.setHeader('Content-Type', 'text/html');
+        res.end(htmlContent);
+    } else if (pathname == '/submit') {
+        var comment = urlObj.query;
+        comments.push(comment);
+        res.end(JSON.stringify(comments));
+    } else {
+        var filePath = path.join(__dirname, pathname);
+        if (fs.existsSync(filePath)) {
+            var fileContent = fs.readFileSync(filePath);
+            res.end(fileContent);
+        } else {
+            res.statusCode = 404;
+            res.end('404 Not Found');
+        }
+    }
 });
 
-var Comment = mongoose.model('Comment', commentSchema);
-
-app.use(express.static('public'));
-app.use(bodyParser.json());
-
-app.get('/comments', function(req, res) {
-    Comment.find({}, function(err, comments) {
-        res.send(comments);
-    });
-});
-
-app.post('/comments', function(req, res) {
-    var comment = new Comment(req.body);
-    comment.save(function(err) {
-        if (err) throw err;
-        res.send('Success');
-    });
-});
-
-app.listen(3000, function() {
-    console.log('Server is running on port 3000');
-});
+server.listen(8080, 'localhost');
