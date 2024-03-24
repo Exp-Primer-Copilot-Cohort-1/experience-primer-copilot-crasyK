@@ -35,20 +35,3 @@ app.post('/comments', function(req, res) {
 app.listen(3000, function() {
     console.log('Server is running on port 3000');
 });
-```
-
-```html
-<!-- Path: index.html -->
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Comment Box</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    </head>
-    <body>
-        <div class="container">
-            <h1>Comment Box</h1>
-            <div class="row">
-                <div class="col-md-6">
-                    <form id="commentForm">
-                        <div class="form-group
